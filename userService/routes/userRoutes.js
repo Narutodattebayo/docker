@@ -10,6 +10,7 @@ const Constants = require("../constants").CONSTANTS
 const Redis = require('../redis/redis').REDIS
 const jwt = require("jsonwebtoken")
 const userMiddleware = require('../user.middleware').MIDDLEWARE
+const kafka = require('../kafka/kafka').KAFKA_CONFIGURE
 
 router.post('/signup',
     celebrate({
@@ -86,6 +87,29 @@ router.get('/logout', userMiddleware.userSession, async (req, res, next) => {
         next(err)
     }
 })
+
+router.put('/updateProfile', userMiddleware.userSession,
+    celebrate({
+        body: {
+            name: VALIDATIONS.NAME
+        }
+    }), async (req, res, next) => {
+        try {
+            let payload = req.body
+            console.log(res.locals.userData, "??????????????")
+            databaseService.edit(userModel, { _id: res.locals.userData.userId }, { name: payload.name })
+            let userData = {
+                name: payload.name,
+                email: res.locals.userData.email,
+                userId: res.locals.userData.userId 
+            }
+            await Redis.saveUserData(res.locals.userData.sessionId, userData)
+            kafka.sendMessage("User", [{ key: res.locals.userData.userId, value: payload.name }])
+            return res.send({ http: 200, status: 200, mesage: "Updated Successfully" })
+        } catch (err) {
+            next(err)
+        }
+    })
 
 
 

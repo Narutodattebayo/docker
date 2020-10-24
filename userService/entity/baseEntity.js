@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const keys = require('../keys')
 
 
 let databaseService = {
@@ -23,7 +22,7 @@ let databaseService = {
         console.log(response)
         return response
     },
-    edit: async (model, query,update) => {
+    edit: async (model, query,update,options) => {
         await model.updateOne(query,update)
     }
 

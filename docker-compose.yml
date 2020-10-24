@@ -29,7 +29,45 @@ services:
     depends_on:
       - mongo
       - redis
-    restart: always   
+      - kafka
+    restart: always
+   mongo1:
+    restart: always
+    image: mongo:latest 
+    ports:
+      - "27017"
+    volumes:
+      - ./mongo1:/data/db
+    environment:
+      - kafkahost=kafka:9092  
+   posts:
+     build:
+      dockerfile: Dockerfile
+      context: ./posts
+     ports:
+      - 3333:3333
+     depends_on:
+      - mongo1
+      - redis
+   zookeeper:
+     image: 'bitnami/zookeeper:latest' 
+     environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - ALLOW_ANONYMOUS_LOGIN=yes
+   kafka:
+     image: 'bitnami/kafka:latest'
+     depends_on:
+      - zookeeper
+     environment:
+       - KAFKA_BROKER_ID=1
+       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+       - ALLOW_PLAINTEXT_LISTENER=yes
+     restart: always 
+     ports:
+      - "9092:9092"
+     volumes:
+      - ./kafkadata:/data/kafka        
+
       
     
 

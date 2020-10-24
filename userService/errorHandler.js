@@ -1,7 +1,8 @@
 const { celebrate, Joi, errors, Segments,isCelebrateError } = require('celebrate');
 
 const errorHandler = (error, req, res, next) => {
-    console.log(error.details)
+    console.log("hello...........................................")
+    console.log(error.details,"?????????/",isCelebrateError(error))
     if (isCelebrateError(error)) {
         res.send({ httpCode: 400, status: 400, message: error.details })
     } else {
