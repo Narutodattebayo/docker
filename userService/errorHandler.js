@@ -1,12 +1,27 @@
-const { celebrate, Joi, errors, Segments,isCelebrateError } = require('celebrate');
+const { celebrate, Joi, errors, Segments,isCelebrateError,isCelebrate } = require('celebrate');
 
-const errorHandler = (error, req, res, next) => {
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",typeof(error))
-    console.log(error.details,"?????????/",isCelebrateError(error))
-    if (isCelebrateError(error)) {
-        res.send({ httpCode: 400, status: 400, message: error })
+const errorHandler = (err, req, res, next) => {
+    console.log(err,"////////////////")
+    if (isCelebrate(err)) {
+        return res.status(400).send({
+            success: false,
+            statusCode: 400,
+            key: err.joi.details[0].context.key,
+            message: err.joi.details[0].message.replace(/"/g, '')
+        });
+    } else if (err.expose) {
+        return res.status(err.status).json({
+            success: false,
+            message: err.message,
+            statusCode: err.statusCode
+        });
     } else {
-        res.send({ httpCode: 500, status: 500, message: "Internal server error" })
+        console.log('ERROR -> ', err);
+        return res.status(500).json({
+            success: false,
+            statusCode: 500,
+            message: 'Internal Server Error'
+        });
     }
 
 }

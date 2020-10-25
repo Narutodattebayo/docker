@@ -1,29 +1,33 @@
-//const { celebrate, Joi, errors, Segments, isCelebrateError,CelebrateError } = require('celebrate');
-const celebrate=require("celebrate")
-const errorHandler = (error, req, res, next) => {
-   
-    console.log(error, "&&&&&&&&&&&&&", error.details)
-    ;
-    let myerror=JSON.stringify(error.details)
-    console.log(",,,,,,,,",myerror)
-    if (celebrate.isCelebrateError(error)) {
-         res.send({
+const { celebrate, Joi, errors, Segments,isCelebrateError,isCelebrate } = require('celebrate');
+
+const errorHandler = (err, req, res, next) => {
+    console.log(err,".......................")
+    if (isCelebrate(err)) {
+        return res.status(400).send({
             success: false,
             statusCode: 400,
-            key: error.details,
-            message: error
+            key: err.joi.details[0].context.key,
+            message: err.joi.details[0].message.replace(/"/g, '')
         });
-        // res.send({ httpCode: 400, status: 400, message: error })
+    } else if (err.expose) {
+        return res.status(err.status).json({
+            success: false,
+            message: err.message,
+            statusCode: err.statusCode
+        });
+    } else {
+        console.log('ERROR -> ', err);
+        return res.status(500).json({
+            success: false,
+            statusCode: 500,
+            message: 'Internal Server Error'
+        });
     }
-    else {
-        res.send({ httpCode: 500, status: 500, message: "Internal server error" })
-    }
-
 
 }
 
-const invalidRoute = (req, res, next) => {
-    res.send({ http: 404, status: 404, message: "Route not found" })
+const invalidRoute=(req,res,next)=>{
+    res.send({http:404,status:404,message:"Route not found"})
 }
 
-module.exports = { errorHandler, invalidRoute }
+module.exports = { errorHandler,invalidRoute }

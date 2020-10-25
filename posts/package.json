@@ -12,7 +12,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "mongoose": "*",
-    "celebrate": "^12.1.0",
+    "celebrate": "^10.0.1",
     "redis": "*",
     "jsonwebtoken": "*",
     "kafkajs":"*"
