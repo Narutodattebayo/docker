@@ -1,7 +1,7 @@
 //const { celebrate, Joi, errors, Segments, isCelebrateError,CelebrateError } = require('celebrate');
 const celebrate=require("celebrate")
 const errorHandler = (error, req, res, next) => {
-
+   
     console.log(error, "&&&&&&&&&&&&&", error.details)
     ;
     let myerror=JSON.stringify(error.details)
